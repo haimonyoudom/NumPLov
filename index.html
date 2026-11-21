@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NumPlov</title>
+<style>
+:root{--bg:#f3f5f6;--card:#fff;--tx:#13212a;--mut:#62707b;--pri:#0a6c68;--pri2:#dcf0ee;--onp:#fff;--line:#e0e6e9;--map:#e8eded;--blk:#cfd8dc;--rd:#fff;--red:#d33a2c;--amb:#e08a00;--grn:#1b8a4b;--blu:#1769e0;--pur:#8a3fc0;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f161c;--card:#19232b;--tx:#e8eef2;--mut:#93a1ad;--pri:#3fc1b8;--pri2:#16363a;--onp:#06201f;--line:#2a353e;--map:#15202a;--blk:#202c36;--rd:#35444f;--red:#ff6b5c;--amb:#ffb02e;--grn:#4cd68a;--blu:#6aa5ff;--pur:#c79bff;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f161c;--card:#19232b;--tx:#e8eef2;--mut:#93a1ad;--pri:#3fc1b8;--pri2:#16363a;--onp:#06201f;--line:#2a353e;--map:#15202a;--blk:#202c36;--rd:'#35444f';--red:'#ff6b5c';--amb:'#ffb02e';--grn:'#4cd68a';--blu:'#6aa5ff';--pur:'#c79bff';color-scheme:dark}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI","Noto Sans Khmer","Khmer OS",sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}
+#app{height:100%;max-width:460px;margin:0 auto;display:flex;flex-direction:column;position:relative;background:var(--bg);overflow:hidden}
+.scr{flex:1;min-height:0;display:none;overflow-y:auto;position:relative}.scr.on{display:block}
+#sMap{overflow:hidden;background:var(--map)}
+h2{margin:16px 14px 10px;font-size:21px}
+.top{position:absolute;top:10px;left:10px;right:10px;z-index:4}
+.sb{display:flex;gap:8px;align-items:center;background:var(--card);border-radius:14px;padding:10px 12px;box-shadow:0 2px 10px #0003}
+.sb input{flex:1;border:0;background:none;color:var(--tx);font:inherit;outline:0;min-width:0}
+.vp{display:flex;gap:6px;margin-top:8px}
+.res{background:var(--card);border-radius:14px;margin-top:6px;box-shadow:0 2px 10px #0003;max-height:230px;overflow:auto}
+.res div{padding:10px 12px;border-bottom:1px solid var(--line)}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:7px 12px;font-size:13px;white-space:nowrap}
+.chip.on{background:var(--pri);color:var(--onp);border-color:var(--pri);font-weight:600}
+.vp .chip{box-shadow:0 2px 8px #0003}
+.row{display:flex;gap:8px;overflow-x:auto;padding:0 14px 10px}
+.card{background:var(--card);border-radius:14px;padding:12px;margin:0 14px 10px;border:1px solid var(--line)}
+.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:600;background:var(--pri);color:var(--onp)}
+.btn.g{background:var(--pri2);color:var(--pri)}
+.sm{font-size:12.5px;color:var(--mut)}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.x{border:0;background:var(--line);border-radius:50%;width:30px;height:30px;flex:none}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;color:var(--onp)}
+.t-closed{background:var(--red)}.t-upcoming{background:var(--pur)}.t-warn{background:var(--amb);color:#201400}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:18px 18px 0 0;padding:14px 16px 16px;box-shadow:0 -4px 16px #0003;z-index:5;max-height:62%;overflow:auto;display:none}
+.fab{position:absolute;right:12px;bottom:12px;width:46px;height:46px;border-radius:50%;border:0;background:var(--card);box-shadow:0 2px 10px #0004;font-size:20px;z-index:4}
+.leg{position:absolute;left:10px;bottom:12px;background:var(--card);border-radius:10px;padding:5px 9px;font-size:10.5px;color:var(--mut);z-index:3;box-shadow:0 2px 8px #0003}
+#sMap.sh .fab,#sMap.sh .leg{display:none}
+nav{display:flex;border-top:1px solid var(--line);background:var(--card)}
+nav button{flex:1;border:0;background:none;color:var(--mut);padding:8px 0 6px;font-size:11px;position:relative}
+nav button.on{color:var(--pri);font-weight:700}
+nav i{display:block;font-style:normal;font-size:20px}
+.bd{position:absolute;top:3px;left:56%;background:var(--red);color:#fff;border-radius:99px;font-size:10px;padding:0 5px}
+#toast{position:absolute;top:8px;left:10px;right:10px;z-index:20;background:var(--tx);color:var(--bg);border-radius:12px;padding:11px 14px;display:none;box-shadow:0 4px 14px #0005;font-size:14px}
+.set{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.sw{width:44px;height:26px;border-radius:99px;border:0;background:var(--line);position:relative;flex:none}
+.sw:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--pri)}.sw.on:after{left:21px}
+.cs{stroke:var(--blk);stroke-width:12;stroke-linecap:round}
+.rf{stroke:var(--rd);stroke-width:9;stroke-linecap:round}
+.ht{stroke:transparent;stroke-width:24;cursor:pointer}
+.rs{fill:none;stroke:var(--blu);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;opacity:.92;pointer-events:none}
+.ra{fill:none;stroke:var(--mut);stroke-width:6;opacity:.7;stroke-linecap:round;stroke-linejoin:round;cursor:pointer}
+svg text{font-family:system-ui,sans-serif}
+</style></head><body>
+<div id="app">
+<div id="toast" onclick="go('Alerts')"></div>
+
+<div class="scr on" id="sMap">
+ <svg id="svg" viewBox="0 -40 340 550" style="width:100%;height:100%;display:block"><g id="g1"></g><g id="g2"></g></svg>
+ <div class="top">
+  <div class="sb"><span>🔎</span><input id="q" autocomplete="off" oninput="msearch(this.value)" onfocus="msearch(this.value)"></div>
+  <div class="vp" id="vp"></div>
+  <div class="res" id="res" style="display:none"></div>
+ </div>
+ <div class="leg">✕ Closed · ! Warning · ➤ One-way · ··· Motorbike only</div>
+ <button class="fab" onclick="locate()" aria-label="My location">🎯</button>
+ <div class="sheet" id="sheet"></div>
+</div>
+
+<div class="scr" id="sExplore">
+ <h2 data-i="explore"></h2>
+ <div style="padding:0 14px 10px"><div class="sb" style="box-shadow:none;border:1px solid var(--line)"><span>🔎</span><input placeholder="Search places by name" oninput="X.q=this.value;rList()"></div></div>
+ <div class="row" id="exChips"></div><div class="row" id="exFil"></div><div id="exList"></div>
+ <div class="sm" style="padding:0 14px 16px">Places and positions are sample data on a schematic map.</div>
+</div>
+
+<div class="scr" id="sAlerts">
+ <h2 data-i="alerts"></h2>
+ <div class="card"><b>Prototype controls</b><div class="sm" style="margin:4px 0 8px">Simulate an official announcement. If it hits your active route, you get an alert and a new route.</div>
+  <div style="display:flex;gap:8px"><button class="btn" onclick="simulate()">Simulate new closure</button><button class="btn g" onclick="resetDemo()">Reset demo</button></div></div>
+ <div class="row" id="alF"></div><div id="alList"></div>
+</div>
+
+<div class="scr" id="sSaved"><h2 data-i="saved"></h2><div id="svList"></div><div class="sm" style="padding:0 14px 16px">Tap ☆ Save on any place to add it here.</div></div>
+<div class="scr" id="sProfile"><h2 data-i="profile"></h2><div id="pfBody"></div></div>
+
+<nav id="nav">
+ <button class="on" onclick="go('Map')"><i>🗺️</i><span data-i="map"></span></button>
+ <button onclick="go('Explore')"><i>🧭</i><span data-i="explore"></span></button>
+ <button onclick="go('Alerts')"><i>🔔</i><span data-i="alerts"></span><b class="bd" id="bd"></b></button>
+ <button onclick="go('Saved')"><i>⭐</i><span data-i="saved"></span></button>
+ <button onclick="go('Profile')"><i>👤</i><span data-i="profile"></span></button>
+</nav>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const L={en:{map:'Map',explore:'Explore',alerts:'Alerts',saved:'Saved',profile:'Profile',search:'Search streets or places',car:'Car',moto:'Motorbike',dir:'Get Directions',start:'Start',end:'End',closed:'Road Closed',upcoming:'Upcoming Closure',warn:'Traffic Warning',all:'All',official:'Official',save:'Save',back:'Back'},
+km:{map:'ផែនទី',explore:'ស្វែងរក',alerts:'ការជូនដំណឹង',saved:'ទីតាំងរក្សាទុក',profile:'ប្រវត្តិរូប',search:'ស្វែងរកផ្លូវ ឬទីតាំង',car:'ឡាន',moto:'ម៉ូតូ',dir:'ទិសដៅ',start:'ចាប់ផ្តើម',end:'បញ្ចប់',closed:'ផ្លូវបិទ',upcoming:'នឹងបិទ',warn:'ការព្រមានចរាចរណ៍',all:'ទាំងអស់',official:'ផ្លូវការ',save:'រក្សាទុក',back:'ត្រឡប់'}};
+const P={lang:'en',veh:'moto',gps:1,cl:1,mine:0,warn:1,ow:1,mo:1,pl:1};
+const t=k=>L[P.lang][k]||L.en[k]||k;
+// ---- schematic road network (sample data) ----
+const cx=[40,120,210,300],cy=[80,190,300,410];
+const CN=['St 271','Monivong Blvd','Norodom Blvd','Sisowath Quay'],RN=['Russian Blvd','St 310','Sihanouk Blvd','St 240'];
+const N=[];for(let r=0;r<4;r++)for(let c=0;c<4;c++)N.push([cx[c],cy[r]]);
+const E=[];
+const add=(a,b,n)=>E.push({a,b,n,len:Math.hypot(N[a][0]-N[b][0],N[a][1]-N[b][1]),ow:0,car:0});
+for(let r=0;r<4;r++)for(let c=0;c<4;c++){if(c<3)add(r*4+c,r*4+c+1,RN[r]);if(r<3)add(r*4+c,(r+1)*4+c,CN[c])}
+const eid=(a,b)=>E.findIndex(e=>(e.a==a&&e.b==b)||(e.a==b&&e.b==a));
+E[eid(5,6)].ow=1;E[eid(3,7)].ow=1;E[eid(4,8)].car=1;
+const C0=()=>[
+{e:eid(6,10),t:'closed',why:'Public ceremony',time:'07:00–12:00 today',src:'Phnom Penh Capital Hall (demo)',off:1,upd:'20 min ago'},
+{e:eid(10,11),t:'upcoming',why:'City marathon',time:'Tomorrow 06:00–10:00',src:'Dept. of Public Works and Transport (demo)',off:1,upd:'2 h ago'},
+{e:eid(9,13),t:'warn',why:'Flooding reported after rain',time:'Ongoing',src:'Community report, not yet verified',off:0,upd:'35 min ago'}];
+let C=C0();
+const adj=N.map(()=>[]);E.forEach((e,i)=>{adj[e.a].push({to:e.b,e:i,f:1});adj[e.b].push({to:e.a,e:i,f:0})});
+const cl=i=>C.find(c=>c.e==i&&c.t=='closed');
+function why(i,f,v){const e=E[i],c=cl(i);if(c)return'Road closed: '+c.why;if(e.ow&&!f)return'One-way, no entry on '+e.n;if(e.car&&v=='car')return'Cars not allowed on '+e.n+' (motorbikes only)';return''}
+function dij(s,d,v,mode,pen){
+ const D=Array(16).fill(1e9),Pr=Array(16).fill(null),Q=new Set([...Array(16).keys()]);D[s]=0;
+ while(Q.size){let u=-1;Q.forEach(x=>{if(u<0||D[x]<D[u])u=x});if(D[u]>=1e9)break;Q.delete(u);if(u==d)break;
+  adj[u].forEach(h=>{if(mode!='free'&&why(h.e,h.f,v))return;let w=E[h.e].len;if(C.some(c=>c.e==h.e&&c.t=='warn'))w*=1.8;if(pen&&pen.has(h.e))w*=2.5;if(D[u]+w<D[h.to]){D[h.to]=D[u]+w;Pr[h.to]=[u,h]}})}
+ if(D[d]>=1e9)return null;const nodes=[d],es=[],fw=[];let x=d;while(x!=s){const[u,h]=Pr[x];es.unshift(h.e);fw.unshift(h.f);nodes.unshift(u);x=u}return{nodes,es,fw}}
+function routes(s,d,v){const a=dij(s,d,v);if(!a)return[];const b=dij(s,d,v,'',new Set(a.es));return b&&b.es.join()!=a.es.join()?[a,b]:[a]}
+function info(r){const k=r.es.reduce((s,i)=>s+E[i].len,0)*0.011,w=r.es.filter(i=>C.some(c=>c.e==i&&c.t=='warn')).length;return{k:k.toFixed(1),m:Math.max(1,Math.round(k/(V=='car'?20:26)*60+w*2))}}
+const names=r=>[...new Set(r.es.map(i=>E[i].n))].join(' → ');
+function notes(r,v,s,d){const n=[],f=dij(s,d,v,'free');
+ if(f)f.es.forEach((i,k)=>{const w=why(i,f.fw[k],v),m='🚫 Avoided: '+w;if(w&&!n.includes(m))n.push(m)});
+ r.es.forEach(i=>{const c=C.find(c=>c.e==i&&c.t!='closed');if(c)n.push(c.t=='warn'?'⚠️ '+c.why+' on '+E[i].n:'🕒 Upcoming closure on '+E[i].n+' ('+c.time+')')});return n}
+// ---- places (sample data) ----
+const CATS=[['Government','🏛️'],['Food and Drinks','🍜'],['Healthcare','🏥'],['Education','🎓'],['Shopping','🛍️'],['Transportation','⛽'],['Essential Services','🏧'],['Recreation','🌳'],['Fitness','🏋️'],['Tourism','🛕']],CE=Object.fromEntries(CATS);
+const PL="ITC|Education|0|0|1|4.6|;City Library|Education|1|0|1|4.4|;Phnom Penh Capital Hall|Government|3|0|1|4|;Sangkat Police Post|Government|1|3|1|0|;Riverside Café|Food and Drinks|3|1|1|4.5|;Khmer Noodle Shop|Food and Drinks|0|2|0|4.3|;Calmette Hospital|Healthcare|1|2|1|4.2|;Corner Pharmacy|Healthcare|2|2|1|4.1|;Central Market|Shopping|1|1|1|4.4|;Riverside Parking|Transportation|3|2|1|0|Parking: moto 500៛ · car 2,000៛;PTT Fuel Station|Transportation|2|1|1|0|;Bank and ATM|Essential Services|0|1|1|0|;Wat Phnom Park|Recreation|2|0|1|4.5|;FitZone Gym|Fitness|3|3|1|4.2|;Independence Monument|Tourism|2|2|1|4.7|;Royal Palace|Tourism|3|3|0|4.6|;Home|Personal|2|3|1|0|;Workplace|Personal|3|1|1|0|".split(';').map((s,i)=>{const a=s.split('|'),node=+a[3]*4+ +a[2];return{n:a[0],cat:a[1],node,open:+a[4],r:+a[5],p:a[6],x:N[node][0]+((i*37)%15)-7,y:N[node][1]+((i*53)%15)-7,i}});
+const em=p=>p.n=='Home'?'🏠':p.n=='Workplace'?'💼':CE[p.cat];
+// ---- state ----
+let me=12,V='moto',dest=null,rts=[],ri=0,mode=null,nav=null,roadI=0,zm=0,AF='all',saved=['ITC','Home','Workplace'];const X={q:'',cat:null,d:0,o:0};
+const FULL=[0,-40,340,550];
+const dkm=p=>Math.hypot(N[me][0]-p.x,N[me][1]-p.y)*0.011;
+const addr=p=>RN[Math.floor(p.node/4)]+' × '+CN[p.node%4];
+const vis=()=>C.filter(c=>c.t!='warn'||P.warn);
+// ---- drawing ----
+function draw(){
+ let a='',b='';const ln=(e,c,x)=>`<line ${c?`class="${c}"`:''} x1="${N[e.a][0]}" y1="${N[e.a][1]}" x2="${N[e.b][0]}" y2="${N[e.b][1]}" ${x||''}/>`;
+ a+='<rect x="318" y="-40" width="30" height="550" fill="#7fb8dc" opacity=".5"/><text x="329" y="230" font-size="8" fill="var(--mut)" transform="rotate(90 329 230)" text-anchor="middle">Tonle Sap</text><rect x="128" y="88" width="74" height="94" rx="8" fill="var(--grn)" opacity=".13"/><rect x="48" y="316" width="64" height="86" rx="8" fill="var(--grn)" opacity=".1"/>';
+ E.forEach(e=>a+=ln(e,'cs'));E.forEach(e=>a+=ln(e,'rf'));
+ const col={closed:'var(--red)',upcoming:'var(--pur)',warn:'var(--amb)'};
+ vis().forEach(c=>a+=ln(E[c.e],'',`stroke="${col[c.t]}" stroke-width="4" stroke-dasharray="${c.t=='warn'?'2 4':'6 5'}" stroke-linecap="round"`));
+ if(P.mo)E.forEach(e=>{if(e.car)a+=ln(e,'','stroke="var(--grn)" stroke-width="3" stroke-dasharray="1 5" stroke-linecap="round"')});
+ E.forEach((e,i)=>{const p=N[e.a],q=N[e.b],mx=(p[0]+q[0])/2,my=(p[1]+q[1])/2,hz=p[1]==q[1];
+  if(P.ow&&e.ow)a+=`<path d="M-5,-4L5,0L-5,4Z" fill="var(--pri)" transform="translate(${mx+(hz?0:0)},${my}) rotate(${Math.atan2(q[1]-p[1],q[0]-p[0])*180/Math.PI})"/>`;
+  if(hz&&e.a%4==1)a+=`<text x="${mx}" y="${my-9}" font-size="7.5" fill="var(--mut)" text-anchor="middle">${e.n}</text>`;
+  if(!hz&&Math.floor(e.a/4)==1)a+=`<text transform="translate(${mx-9},${my}) rotate(-90)" font-size="7.5" fill="var(--mut)" text-anchor="middle">${e.n}</text>`});
+ E.forEach((e,i)=>a+=ln(e,'ht',`onclick="road(${i})"`));
+ vis().forEach(c=>{const e=E[c.e],mx=(N[e.a][0]+N[e.b][0])/2,my=(N[e.a][1]+N[e.b][1])/2;a+=`<g transform="translate(${mx},${my})" onclick="road(${c.e})" style="cursor:pointer"><circle r="8.5" fill="${col[c.t]}" stroke="#fff" stroke-width="1.5"/><text y="3.5" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">${c.t=='closed'?'✕':c.t=='warn'?'!':'⏳'}</text></g>`});
+ const rt=(nodes,cls,k)=>`<polyline class="${cls}" points="${nodes.map(n=>N[n].join(',')).join(' ')}" ${cls=='ra'?`onclick="ri=${k};draw();sheet()"`:''}/>`;
+ if(mode=='nav'&&nav)b+=rt(nav.nodes.slice(nav.k),'rs');else rts.map((r,k)=>({r,k})).sort((x,y)=>(x.k==ri)-(y.k==ri)).forEach(({r,k})=>b+=rt(r.nodes,k==ri?'rs':'ra',k));
+ if(P.pl)PL.forEach(p=>{if(p!==dest)b+=`<g transform="translate(${p.x},${p.y})" onclick="pick(${p.i})" style="cursor:pointer"><circle r="7.5" fill="var(--card)" stroke="var(--pri)" stroke-width="1.2"/><text y="3.2" text-anchor="middle" font-size="9">${em(p)}</text></g>`});
+ if(dest)b+=`<g transform="translate(${dest.x},${dest.y})"><circle r="12" fill="var(--red)" stroke="#fff" stroke-width="2"/><text y="4.5" text-anchor="middle" font-size="12">${em(dest)}</text></g>`;
+ if(P.gps)b+=`<g transform="translate(${N[me][0]},${N[me][1]})"><circle r="8" fill="var(--blu)" opacity=".4"><animate attributeName="r" values="7;18;7" dur="2.2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".45;0;.45" dur="2.2s" repeatCount="indefinite"/></circle><circle r="6" fill="var(--blu)" stroke="#fff" stroke-width="2.5"/></g>`;
+ $('#g1').innerHTML=a;$('#g2').innerHTML=b;badge()}
+function setVB(v){$('#svg').setAttribute('viewBox',v.join(' '))}
+function locate(){if(!P.gps){toast('Location is off. Turn it on in Profile.');return}zm=!zm;setVB(zm?[N[me][0]-80,N[me][1]-125,160,240]:FULL)}
+// ---- sheet ----
+function closeSheet(){stopNav();mode=null;dest=null;rts=[];draw();sheet()}
+function stopNav(){if(nav){clearInterval(nav.t);nav=null}}
+const dirTxt=e=>N[e.b][0]>N[e.a][0]?'eastbound →':'southbound ↓';
+function sheet(){
+ const s=$('#sheet'),m=$('#sMap');if(!mode){s.style.display='none';m.classList.remove('sh');return}
+ m.classList.add('sh');s.style.display='block';let h='';
+ if(mode=='road'){const e=E[roadI],c=cl(roadI),o=C.find(c=>c.e==roadI&&c.t!='closed'),z=c||o;
+  h=`<div class="hd"><b style="font-size:17px">${e.n}</b><button class="x" onclick="closeSheet()">✕</button></div>`+
+  `<div class="set"><span>Status</span><b>${c?'⛔ Closed':o?(o.t=='warn'?'⚠️ Traffic warning':'🕒 Upcoming closure'):'✅ Open'}</b></div>`+
+  (z?`<div class="sm" style="padding:8px 0">${z.why} · ${z.time}<br>${z.off?'✔ Official: ':'⚠ Unverified: '}${z.src} · updated ${z.upd}</div>`:'')+
+  `<div class="set"><span>Direction</span><b>${e.ow?'One-way '+dirTxt(e):'Two-way'}</b></div>`+
+  `<div class="set"><span>🚗 ${t('car')}</span><b>${e.car?'Not allowed':'Allowed'}</b></div><div class="set"><span>🏍️ ${t('moto')}</span><b>Allowed</b></div>`+
+  `<div class="sm" style="padding-top:8px">Sample regulation data for this prototype. Real road signs and police instructions always take priority.</div>`}
+ else if(mode=='dest'){const p=dest;
+  h=`<div class="hd"><div><b style="font-size:17px">${p.n}</b><div class="sm">${em(p)} ${p.cat=='Personal'?'Saved place':p.cat} · ${addr(p)}</div></div><button class="x" onclick="closeSheet()">✕</button></div><div class="sm">${dkm(p).toFixed(1)} km away · ${p.open?'🟢 Open':'🔴 Closed'}${p.r?' · ★ '+p.r:''}${p.p?' · '+p.p:''}</div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="flex:1" onclick="getDir()">${t('dir')}</button><button class="btn g" onclick="toggleSave('${p.n}')">${saved.includes(p.n)?'★':'☆'} ${t('save')}</button></div>`}
+ else if(mode=='dir'){
+  h=`<div class="hd"><div><b style="font-size:17px">To ${dest.n}</b><div class="sm">${V=='car'?'🚗':'🏍️'} ${t(V)}</div></div><button class="x" onclick="closeSheet()">✕</button></div>`;
+  if(!rts.length)h+=`<div class="sm">No legal route found for a ${t(V).toLowerCase()} right now. Closures or restrictions block every path.</div>`;
+  else{const r=rts[ri];h+=`<div class="row" style="padding:0 0 8px">${rts.map((x,k)=>{const i=info(x);return`<button class="chip ${k==ri?'on':''}" onclick="ri=${k};draw();sheet()">Route ${k+1} · ${i.m} min · ${i.k} km</button>`}).join('')}</div><div class="sm">Via ${names(r)||'destination'}</div>`+notes(r,V,me,dest.node).map(n=>`<div class="sm" style="margin-top:4px">${n}</div>`).join('')+`<div style="display:flex;gap:8px;margin-top:12px"><button class="btn" style="flex:1" onclick="startNav()">▶ ${t('start')}</button><button class="btn g" onclick="mode='dest';rts=[];draw();sheet()">${t('back')}</button></div>`}}
+ else if(mode=='nav'){const i=info({es:nav.es.slice(nav.k)}),nx=nav.es[nav.k]!=null?E[nav.es[nav.k]].n:dest.n;
+  h=`<div class="hd"><b style="font-size:17px">🧭 To ${dest.n}</b></div><div style="font-size:16px">Continue on <b>${nx}</b></div><div class="sm" style="margin:4px 0 12px">${i.m} min · ${i.k} km left · closures are re-checked live</div><button class="btn" onclick="endNav()">${t('end')}</button>`}
+ s.innerHTML=h}
+function road(i){if(mode=='nav')return;roadI=i;mode='road';dest=null;rts=[];go('Map');draw();sheet()}
+function roadByName(n){const ix=E.map((e,i)=>i).filter(i=>E[i].n==n);hideRes();road(ix.find(i=>E[i].ow||E[i].car||C.some(c=>c.e==i))??ix[0])}
+function pick(i){if(mode=='nav')return;stopNav();dest=PL[i];rts=[];mode='dest';hideRes();$('#q').value=dest.n;go('Map');draw();sheet()}
+function getDir(){stopNav();rts=routes(me,dest.node,V);ri=0;mode='dir';draw();sheet()}
+function startNav(){const r=rts[ri];stopNav();nav={nodes:r.nodes,es:r.es,k:0};mode='nav';
+ nav.t=setInterval(()=>{nav.k++;me=nav.nodes[nav.k];if(nav.k>=nav.nodes.length-1){stopNav();mode='dest';toast('✅ You have arrived at '+dest.n)}draw();sheet()},1100);draw();sheet()}
+function endNav(){stopNav();getDir()}
+function setV(v){V=v;pills();if(dest&&(mode=='dir'||mode=='nav'))getDir();else draw();rAlerts()}
+function pills(){$('#vp').innerHTML=[['car','🚗'],['moto','🏍️']].map(([k,e])=>`<button class="chip ${V==k?'on':''}" onclick="setV('${k}')">${e} ${t(k)}</button>`).join('')}
+function toggleSave(n){saved=saved.includes(n)?saved.filter(x=>x!=n):[...saved,n];rSaved();sheet()}
+// ---- search ----
+function msearch(q){q=q.toLowerCase();const R=$('#res');
+ const pl=PL.filter(p=>p.n.toLowerCase().includes(q)).slice(0,5),rd=[...new Set(E.map(e=>e.n))].filter(n=>q&&n.toLowerCase().includes(q)).slice(0,3);
+ R.innerHTML=pl.map(p=>`<div onclick="pick(${p.i})">${em(p)} <b>${p.n}</b> <span class="sm">${p.cat=='Personal'?'Saved':p.cat}</span></div>`).join('')+rd.map(n=>`<div onclick="roadByName('${n}')">🛣️ <b>${n}</b> <span class="sm">Road</span></div>`).join('');R.style.display=R.innerHTML?'block':'none'}
+function hideRes(){$('#res').style.display='none'}
+document.addEventListener('click',e=>{if(!e.target.closest('.top'))hideRes()});
+// ---- alerts ----
+let tt;function toast(m){const e=$('#toast');e.textContent=m;e.style.display='block';clearTimeout(tt);tt=setTimeout(()=>e.style.display='none',5500)}
+function badge(){const n=vis().length;$('#bd').textContent=n||'';$('#bd').style.display=n?'':'none'}
+function simulate(){
+ const r=rts[ri],act=(mode=='dir'||mode=='nav')&&r;
+ const pool=(act?(mode=='nav'?r.es.slice(nav.k):r.es):[]).filter(i=>!cl(i));
+ const e=pool.length?pool[pool.length>>1]:[eid(0,1),eid(1,2),eid(2,3)].find(i=>!cl(i));
+ if(e==null){toast('All demo roads are already closed. Tap Reset demo.');return}
+ C.unshift({e,t:'closed',why:'Emergency repair works',time:'Now to 15:00',src:'Phnom Penh Capital Hall (demo)',off:1,upd:'Just now'});
+ const aff=act&&r.es.includes(e);
+ if(aff){const wasNav=mode=='nav';stopNav();rts=routes(me,dest.node,V);ri=0;mode='dir';if(wasNav&&rts.length)startNav()}
+ if(P.cl&&(aff||!P.mine))toast('⛔ '+E[e].n+' is closed'+(aff?'. Your route was updated.':'. Tap to view.'));
+ draw();sheet();rAlerts()}
+function resetDemo(){stopNav();C=C0();me=12;mode=null;dest=null;rts=[];draw();sheet();rAlerts();toast('Demo data reset')}
+function rAlerts(){
+ $('#alF').innerHTML=['all','closed','upcoming','warn'].map(k=>`<button class="chip ${AF==k?'on':''}" onclick="AF='${k}';rAlerts()">${t(k)}</button>`).join('');
+ const l=vis().filter(c=>AF=='all'||c.t==AF);
+ $('#alList').innerHTML=l.map(c=>{const e=E[c.e],aff=(mode=='dir'||mode=='nav')&&rts[ri]&&rts[ri].es.includes(c.e);let alt='';
+  if(c.t=='closed'){const r=dij(e.a,e.b,V);alt=r?'Alternative for '+t(V).toLowerCase()+': '+names(r):'No legal alternative found'}else if(c.t=='upcoming')alt='Routes will avoid it automatically once it starts.';
+  return`<div class="card"><span class="tag t-${c.t}">${t(c.t)}</span>${aff?' <span class="tag" style="background:var(--blu)">Affects your route</span>':''}<div style="margin-top:6px"><b>${e.n}</b></div><div>${c.why}</div><div class="sm">🕒 ${c.time}</div><div class="sm">${c.off?'✔ '+t('official')+': ':'⚠ Unverified: '}${c.src} · updated ${c.upd}</div>${alt?`<div class="sm">↪ ${alt}</div>`:''}<div style="margin-top:8px"><button class="btn g" onclick="road(${c.e})">View on map</button></div></div>`}).join('')||'<div class="sm" style="padding:0 14px">No alerts in this category.</div>';
+ badge()}
+// ---- explore / saved ----
+function rExplore(){
+ $('#exChips').innerHTML=CATS.map(([n,e])=>`<button class="chip ${X.cat==n?'on':''}" onclick="X.cat=X.cat=='${n}'?null:'${n}';rExplore()">${e} ${n}</button>`).join('');
+ $('#exFil').innerHTML=[['Any distance',0],['≤ 1.5 km',1.5],['≤ 3 km',3]].map(([l,v])=>`<button class="chip ${X.d==v?'on':''}" onclick="X.d=${v};rExplore()">${l}</button>`).join('')+`<button class="chip ${X.o?'on':''}" onclick="X.o=!X.o;rExplore()">🟢 Open now</button>`;rList()}
+function rList(){const q=X.q.toLowerCase();
+ const l=PL.filter(p=>p.cat!='Personal'&&(!X.cat||p.cat==X.cat)&&(!q||p.n.toLowerCase().includes(q))&&(!X.d||dkm(p)<=X.d)&&(!X.o||p.open)).sort((a,b)=>dkm(a)-dkm(b));
+ $('#exList').innerHTML=l.map(p=>`<div class="card"><div class="hd"><div><b>${p.n}</b><div class="sm">${em(p)} ${p.cat} · ${dkm(p).toFixed(1)} km${p.r?' · ★ '+p.r:''}</div></div><span class="tag" style="background:${p.open?'var(--grn)':'var(--mut)'}">${p.open?'Open':'Closed'}</span></div>${p.p?`<div class="sm">${p.p}</div>`:''}<div style="display:flex;gap:8px;margin-top:8px"><button class="btn g" onclick="pick(${p.i})">Show on map</button><button class="btn" onclick="pick(${p.i});getDir()">${t('dir')}</button></div></div>`).join('')||'<div class="sm" style="padding:0 14px 10px">No places match these filters.</div>'}
+function rSaved(){$('#svList').innerHTML=saved.map(n=>PL.find(p=>p.n==n)).filter(Boolean).map(p=>`<div class="card"><div class="hd"><div><b>${em(p)} ${p.n}</b><div class="sm">${addr(p)} · ${dkm(p).toFixed(1)} km</div></div><button class="x" onclick="toggleSave('${p.n}')" aria-label="Remove">✕</button></div><div style="display:flex;gap:8px"><button class="btn g" onclick="pick(${p.i})">Show on map</button><button class="btn" onclick="pick(${p.i});getDir()">${t('dir')}</button></div></div>`).join('')||'<div class="sm" style="padding:0 14px">Nothing saved yet.</div>'}
+// ---- profile ----
+const sw=k=>`<button class="sw ${P[k]?'on':''}" aria-label="toggle" onclick="P['${k}']=!P['${k}'];rProfile();draw();rAlerts()"></button>`;
+const seg=(it,cur,fn)=>'<div style="display:flex;gap:6px">'+it.map(([v,l])=>`<button class="chip ${cur==v?'on':''}" onclick="${fn}('${v}')">${l}</button>`).join('')+'</div>';
+function setLang(l){P.lang=l;applyLang();rProfile();rExplore();rAlerts();rSaved();sheet()}
+function setDef(v){P.veh=v;setV(v);rProfile()}
+function rProfile(){const r=(l,c)=>`<div class="set"><span>${l}</span>${c}</div>`;
+ $('#pfBody').innerHTML=`<div class="card"><div class="hd" style="align-items:center"><div><b>👤 Guest</b><div class="sm">Account sign-in is not part of this prototype.</div></div></div></div>`+
+ `<div class="card">${r('Language',seg([['en','English'],['km','ខ្មែរ']],P.lang,'setLang'))}${r('Default vehicle',seg([['car','🚗 '+t('car')],['moto','🏍️ '+t('moto')]],P.veh,'setDef'))}</div>`+
+ `<div class="card"><b>Notifications</b>${r('Closure alerts',sw('cl'))}${r('Only closures on my route',sw('mine'))}${r('Traffic warnings',sw('warn'))}</div>`+
+ `<div class="card"><b>Location</b>${r('Use my location (GPS)',sw('gps'))}</div>`+
+ `<div class="card"><b>Map preferences</b>${r('One-way arrows',sw('ow'))}${r('Motorbike-only roads',sw('mo'))}${r('Places on map',sw('pl'))}</div>`+
+ `<div class="card"><b>Privacy</b><div class="sm">In this prototype, your location is simulated and nothing leaves your device. Road, closure and place data are samples on a schematic map of central Phnom Penh.</div></div>`}
+// ---- shell ----
+const TABS=['Map','Explore','Alerts','Saved','Profile'];
+function go(n){TABS.forEach((x,i)=>{$('#s'+x).classList.toggle('on',x==n);$('#nav').children[i].classList.toggle('on',x==n)});if(n=='Explore')rExplore();if(n=='Alerts')rAlerts();if(n=='Saved')rSaved();if(n=='Profile')rProfile()}
+function applyLang(){document.documentElement.lang=P.lang=='km'?'km':'en';document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));$('#q').placeholder=t('search');pills()}
+applyLang();draw();rExplore();rAlerts();rSaved();rProfile();go('Map');
+</script></body></html>
